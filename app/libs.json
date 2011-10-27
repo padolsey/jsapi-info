@@ -1,0 +1,66 @@
+{
+
+	"test": {
+		"url": "http://js.padolsey.net/test.js",
+		"dom_env": true,
+		"default_version": "",
+		"versions": [""]
+	},
+
+	"dojo": {
+		"url": "https://ajax.googleapis.com/ajax/libs/dojo/{VERSION}/dojo/dojo.xd.js.uncompressed.js",
+		"dom_env": true,
+		"default_version": "1.6.1",
+		"versions": ["1", "1.1.1", "1.6.0", "1.6.1"],
+		"look_in": ["dojo"]
+	},
+
+	"jquery": {
+		"url": "https://ajax.googleapis.com/ajax/libs/jquery/{VERSION}/jquery.js",
+		"dom_env": true,
+		"default_version": "1.6.4",
+		"versions": ["1", "1.1", "1.2", "1.3", "1.3.2", "1.4", "1.5", "1.6", "1.6.2", "1.6.4"],
+		"get_real_version": "v(\\d+\\.\\d+\\.\\d+)",
+		"look_in": ["jQuery.fn", "jQuery"],
+		"documentation": {
+			"^(?:jQuery|\\$)\\.fn\\.(.+)": "http://api.jquery.com/$1 .entry-content .desc:first",
+			"^(?:jQuery|\\$)\\.(?!fn)(.+)": "http://api.jquery.com/jQuery.$1 .entry-content .desc:first"
+		}
+	},
+
+	"mootools": {
+		"url": "https://ajax.googleapis.com/ajax/libs/mootools/{VERSION}/mootools.js",
+		"dom_env": true,
+		"default_version": "1.4.1",
+		"versions": ["1", "1.4", "1.4.1"],
+		"get_real_version": "version: '(\\d+\\.\\d+\\.\\d+)'",
+		"look_in": ["MooTools", "Array.prototype", "String.prototype", "Number.prototype", "Function.prototype", "Object.prototype", "Event.prototype"],
+		"documentation": {
+			"^(Function|Array|Number|String)\\.prototype\\.(.+)": "http://mootools.net/docs/core/Types/$1#$1:$2 #$1\\:$2 + p.description"
+		}
+	},
+
+	"yui": {
+		"url": "https://ajax.googleapis.com/ajax/libs/yui/{VERSION}/build/yui/yui.js",
+		"dom_env": true,
+		"default_version": "3.3.0",
+		"versions": ["3.3.0"],
+		"get_real_version": "version: (\\d+\\.\\d+\\.\\d+)",
+		"look_in": ["YUI"]
+	},
+
+	"chainvas": {
+		"url": "http://leaverou.me/chainvas/chainvas.js",
+		"dom_env": true,
+		"default_version": "",
+		"versions": [""]
+	},
+
+	"prefixfree": {
+		"url": "https://raw.github.com/LeaVerou/prefixfree/master/prefixfree.js",
+		"dom_env": true,
+		"default_version": "",
+		"versions": [""]
+	}
+
+}

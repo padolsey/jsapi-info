@@ -1,0 +1,44 @@
+body {
+	padding: 20px;
+	font-size: .8em;
+	font-family: sans-serif;
+	background: #FFF;
+}
+
+pre, code {
+	font-family: "Consolas","Lucida Console",Courier,mono;
+}
+
+a {
+	color: #000;
+}
+
+a:hover, a:focus {
+	color: #EEE;
+	background: #1B91CC;
+}
+
+h1 {
+	background: #EEE;
+	border-bottom: #1B91CC 3px solid;
+	margin: 0;
+	padding: 0;
+}
+
+h1 a, h1 span {
+	padding: 15px;
+	display: block;
+}
+
+pre code {
+	line-height: 1.4em;
+}
+
+pre.lines code {
+	color: #666;
+}
+
+#desc {
+	background: #EEE;
+	padding: 15px;
+}
