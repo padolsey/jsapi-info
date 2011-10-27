@@ -25,7 +25,7 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 
 			lib = JSAPI.libs[data.lib];
 
-			if (data.ver == 'default') {
+			if (data.ver == 'default' && lib.default_version) {
 				data.ver = lib.default_version;
 				res.writeHead(302, {
 					Location: '/' + [data.lib, data.ver, data.meth].join('/')
@@ -39,7 +39,7 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 				return;
 			}
 
-			if ('versions' in lib && !~lib.versions.indexOf(data.ver)) {
+			if (data.ver !== 'default' && 'versions' in lib && !~lib.versions.indexOf(data.ver)) {
 				res.end('Version ' + data.ver + ' not available');
 				return;
 			}

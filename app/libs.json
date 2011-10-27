@@ -1,12 +1,5 @@
 {
 
-	"test": {
-		"url": "http://js.padolsey.net/test.js",
-		"dom_env": true,
-		"default_version": "",
-		"versions": [""]
-	},
-
 	"dojo": {
 		"url": "https://ajax.googleapis.com/ajax/libs/dojo/{VERSION}/dojo/dojo.xd.js.uncompressed.js",
 		"dom_env": true,
@@ -53,14 +46,14 @@
 		"url": "http://leaverou.me/chainvas/chainvas.js",
 		"dom_env": true,
 		"default_version": "",
-		"versions": [""]
+		"versions": ["Chainvas"]
 	},
 
 	"prefixfree": {
 		"url": "https://raw.github.com/LeaVerou/prefixfree/master/prefixfree.js",
 		"dom_env": true,
 		"default_version": "",
-		"versions": [""]
+		"versions": ["PrefixFree"]
 	}
 
 }
