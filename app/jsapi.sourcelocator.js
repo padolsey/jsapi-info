@@ -19,6 +19,15 @@ module.exports = SourceLocator = function SourceLocator(lib, ver, meth, libData)
 	this.ver = ver;
 	this.meth = meth;
 
+	// The `nullify` array will contain items that need to be nullified
+	// in order to correctly retrieve the lib's methods.
+	// E.g. MooTools/Underscore implement Func-bind,
+	// we need to nullify Function.prototype.bind so the SourceLocator
+	// finds the libs' implementation instead of native.
+	// (all occurs within jsdom context of course)
+	this.nullify = libData.nullify && libData.nullify[0] ?
+		libData.nullify.join('=null;') + '=null;' : '';
+
 	this.libData = libData;
 
 	this.filename = './libs/' + this.lib + '.' + this.ver + '.js';
@@ -95,7 +104,7 @@ SourceLocator.prototype.getLocalSource = function() {
 SourceLocator.prototype.makeEnv = function(done) {
 	this.env = jsdom.env({
 		html: '<div></div>',
-		src: [SourceLocator.JSAPI.jsdomFixes, this.source],
+		src: [SourceLocator.JSAPI.jsdomFixes, this.nullify, this.source],
 		done: done
 	});
 };

@@ -44,7 +44,21 @@
 		"default_version": "",
 		"versions": [""],
 		"get_real_version": "Underscore.js (\\d+\\.\\d+\\.\\d+)",
-		"look_in": ["_"]
+		"look_in": ["_"],
+		"nullify": [
+			"Object.keys",
+			"Array.prototype.forEach",
+			"Array.prototype.map",
+			"Array.prototype.reduce",
+			"Array.prototype.reduceRight",
+			"Array.prototype.filter",
+			"Array.prototype.every",
+			"Array.prototype.some",
+			"Array.prototype.indexOf",
+			"Array.prototype.lastIndexOf",
+			"Array.isArray",
+			"Function.prototype.bind"
+		]
 	},
 
 	"yui": {
