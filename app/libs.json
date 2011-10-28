@@ -4,6 +4,7 @@
 		"url": "https://ajax.googleapis.com/ajax/libs/dojo/{VERSION}/dojo/dojo.xd.js.uncompressed.js",
 		"dom_env": true,
 		"default_version": "1.6.1",
+		"get_real_version": "dojo/(\\d+\\.\\d+\\.\\d+)",
 		"versions": ["1", "1.1.1", "1.6.0", "1.6.1"],
 		"look_in": ["dojo"]
 	},
