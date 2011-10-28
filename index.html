@@ -1,9 +1,31 @@
 <!doctype html>
-<meta charset="utf-8" />
-<title>JS API info: jQuery, Dojo, Mootools &amp; more...</title>
 
-<p>Under development. Will be with you shortly.</p>
+	<meta charset="utf-8" />
+	<title>JS API info: jQuery, Dojo, Mootools &amp; more...</title>
+	<link rel="stylesheet" type="text/css" href="/main.css" />
+<body>
+
+	<h1><span>JSAPI.info</span></h1>
+	
+	<p>JSAPI.info is a JavaScript library/framework source inspector. It was made with jQuery in mind, but will work with other libraries. Libs are added/configured in <a href="https://github.com/jamespadolsey/jsapi-info/blob/master/app/libs.json">libs.json</a>.</p>
+
+	<p>It's pretty simple. All it shows you is the source of the method you specify. It will also give you the correct line numbers so you can easily find it in the source.</p>
+
+	<p>Source @ <a href="https://github.com/jamespadolsey/jsapi-info">Github</a>.</p>
+
+	<p>Demos (URLs are HACKABLE!):</p>
+
+	<ul>
+		<li><a href="/jquery/1.6.4/extend">/jquery/1.6.4/extend</a></li>
+		<li><a href="/mootools/flatten">/mootools/flatten</a></li>
+		<li><a href="/jquery/$.fn.css">/jquery/$.fn.css</a></li>
+		<li><a href="/dojo/1/Color">/dojo/1/Color</a></li>	
+	</ul>
+
+	<h2>How does it work?</h2>
+
+	<p>It works by loading the library you specify into an instance of <a href="https://github.com/tmpvar/jsdom">jsdom</a>, and then evaluating the method you specify (in fully qualified form, e.g. <code>jQuery.fn.css</code>) within that instance. It then matches the <code>toString()</code> representation of that function (thanks V8!!) against the source of the library, thus determining its location. It's all operating under node.js, running via a beautiful configuration of nginx (primed to microcache!).</p>
 
 
-<!--<p>E.g. Go to <a href="/jquery/$.fn.data">jsapi.info/jquery/$.fn.data</a></p>
--->
+	<p>Brought to you by @<a href="http://twitter.com/padolsey">padolsey</a>.</p>	
+</body>

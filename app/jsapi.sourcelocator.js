@@ -91,7 +91,7 @@ SourceLocator.prototype.getLocalSource = function() {
 SourceLocator.prototype.makeEnv = function(done) {
 	this.env = jsdom.env({
 		html: '<div></div>',
-		src: [SourceLocator.JSAPI.jsdomFixed, this.source],
+		src: [SourceLocator.JSAPI.jsdomFixes, this.source],
 		done: done
 	});
 };
