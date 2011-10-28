@@ -12,7 +12,6 @@ var highlight = require('highlight').Highlight,
 	libs = JSON.parse(fs.readFileSync('./libs.json', 'utf-8')),
 	buildPage = tmpl( fs.readFileSync('./templates/source-page.html', 'utf-8') );
 
-
 var JSAPI = SourceLocator.JSAPI = module.exports = {
 
 	libs: libs,
@@ -155,12 +154,38 @@ JSAPI.Request.prototype = {
 				version: 		sourceData.version,
 				lineNumbers: 	lineNumbers,
 				libName: 		this.lib.name,
+				docLink: 		this.getDocumentationLink(sourceData.name),
+				related: 		sourceData.related,
+				namespace: 		sourceData.namespace,
 				source: 		source,
 				source_link: 	this.lib.url.replace('{VERSION}', sourceData.version),
-				name: 			'<span>' + sourceData.name + '</span>'
+				name: 			sourceData.name
 			})
 
 		);
+
+	},
+
+	getDocumentationLink: function(fullyQualifiedMethodName) {
+
+		var docData = this.lib.documentation,
+			methodName = fullyQualifiedMethodName,
+			link;
+		
+		for (var i in docData) {
+			if (RegExp(i).test(methodName)) {
+				log('Docs: Found matching documentation link: ', methodName, i);
+				link = methodName.replace(RegExp(i), docData[i]);
+				break;
+			}
+		}
+
+		if (!link) {
+			log('Docs: No documentation link found', methodName);
+			return null;
+		}
+
+		return link;
 
 	}
 

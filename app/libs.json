@@ -20,8 +20,8 @@
 		"get_real_version": "v(\\d+\\.\\d+\\.\\d+)",
 		"look_in": ["jQuery.fn", "jQuery"],
 		"documentation": {
-			"^(?:jQuery|\\$)\\.fn\\.(.+)": "http://api.jquery.com/$1 .entry-content .desc:first",
-			"^(?:jQuery|\\$)\\.(?!fn)(.+)": "http://api.jquery.com/jQuery.$1 .entry-content .desc:first"
+			"^(?:jQuery|\\$)\\.fn\\.(.+)": "http://api.jquery.com/$1",
+			"^(?:jQuery|\\$)\\.(?!fn)(.+)": "http://api.jquery.com/jQuery.$1"
 		},
 		"mutate_names": [
 			["^\\$(?=\\.)", "jQuery"],
@@ -38,8 +38,17 @@
 		"get_real_version": "version: '(\\d+\\.\\d+\\.\\d+)'",
 		"look_in": ["MooTools", "Array.prototype", "String.prototype", "Number.prototype", "Function.prototype", "Object.prototype", "Event.prototype"],
 		"documentation": {
-			"^(Function|Array|Number|String)\\.prototype\\.(.+)": "http://mootools.net/docs/core/Types/$1#$1:$2 #$1\\:$2 + p.description"
-		}
+			"^(Function|Array|Number|String|Element)\\.prototype\\.(.+)": "http://mootools.net/docs/core/Types/$1#$1:$2"
+		},
+		"nullify": [
+			"Array.prototype.forEach",
+			"Array.prototype.reduce",
+			"Array.prototype.reduceRight",
+			"Array.prototype.indexOf",
+			"Array.prototype.filter",
+			"Array.prototype.map",
+			"String.prototype.trim"
+		]
 	},
 
 	"_": "underscore",
@@ -50,19 +59,12 @@
 		"versions": [""],
 		"get_real_version": "Underscore.js (\\d+\\.\\d+\\.\\d+)",
 		"look_in": ["_"],
+		"documentation": {
+			"^_\\.(.+)": "http://documentcloud.github.com/underscore/#$1"
+		},
 		"nullify": [
 			"Object.keys",
-			"Array.prototype.forEach",
-			"Array.prototype.map",
-			"Array.prototype.reduce",
-			"Array.prototype.reduceRight",
-			"Array.prototype.filter",
-			"Array.prototype.every",
-			"Array.prototype.some",
-			"Array.prototype.indexOf",
-			"Array.prototype.lastIndexOf",
-			"Array.isArray",
-			"Function.prototype.bind"
+			"Array.isArray"
 		]
 	},
 

@@ -1,34 +1,58 @@
 <!doctype html>
 
 	<meta charset="utf-8" />
-	<title><:= title :> - jsapi.info</title>
+	<title>~:= title :~ - jsapi.info</title>
 	<link rel="stylesheet" type="text/css" href="/main.css" />
 	<link rel="stylesheet" type="text/css" href="/hl_styles/github.css" />
 
-<body>
-	<h1><:= name :></h1>
-	<: if (data.desc) { :>
+<body class="~:=data.related?'has-related':'':~">
+
+	<div id="bar">
+		<a id="home" href="/">JSAPI.info</a>
+		<h1>
+			~: if (data.docLink) { :~
+				<a href="~:= docLink :~">~:= name :~ &raquo;</a>
+			~: } else { :~
+				<span>~:= name :~</span>
+			~: } :~
+		</h1>
+	</div>
+
+	~: if (data.desc) { :~
 		<div id="desc">
-			<p><:= desc :></p>
+			<p>~:= desc :~</p>
 		</div>
-	<: } :>
+	~: } :~
+
 	<h2>
-		<:= libName :> (<:= version :>) - see <a href="<:=source_link:>">full source</a>
+		~:= libName :~ (~:= version :~) - see <a href="~:=source_link:~">full source</a>
 	</h2>
-	<div id="source">
+
+	~: if (data.related) { :~
+		<div id="related">
+			<h3>Related ~:=namespace?'('+namespace+')':'':~:</h3>
+			<ul>
+				~: for (var i = -1, l = Math.min(12, related.length); ++i < l;) { :~
+					<li><a href="~:=related[i].link:~">~:=related[i].name:~</a></li>
+				~: } :~
+			</ul>
+		</div>
+	~: } :~
+
+	<div id="source-container">
 		<table>
 			<tr>
 				<td>
-					<pre id="lines"><code><:= lineNumbers :></code></pre>
+					<pre id="lines"><code>~:= lineNumbers :~</code></pre>
 				</td>
 				<td>
-					<pre id="source"><code><:= source :></code></pre>
+					<pre id="source"><code>~:= source :~</code></pre>
 				</td>
 			</tr>
 		</table>
 	</div>
 
-	<script>
+	<!--<script>
 
 		var _gaq = [['_setAccount', 'UA-3768993-10'], ['_trackPageview']];
 
@@ -40,6 +64,6 @@
 			document.getElementsByTagName('script')[0]
 		));
 
-	</script>
+	</script>-->
 
 </body>

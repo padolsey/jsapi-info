@@ -1,3 +1,5 @@
+// Docs is NOT currently being used.
+
 var events = require('events'),
 	jsdom = require('jsdom'),
 	fs = require('fs'),

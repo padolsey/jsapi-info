@@ -109,7 +109,7 @@ SourceLocator.prototype.makeEnv = function(done) {
 	});
 };
 
-SourceLocator.RESOLVER = '\
+SourceLocator.FN_RESOLVER = '\
 for (var __r__, __i__ = -1, __l__ = __names__.length; ++__i__ < __l__;) {\
 	try {\
 		if (__r__ = eval(__names__[__i__])) {\
@@ -120,8 +120,6 @@ for (var __r__, __i__ = -1, __l__ = __names__.length; ++__i__ < __l__;) {\
 }';
 
 SourceLocator.prototype.find = function() {
-
-	log('find()', !!this.source);
 
 	var me = this,
 		run = false;
@@ -147,8 +145,9 @@ SourceLocator.prototype.find = function() {
 		var lookIn = me.libData.look_in,
 			fqName,
 			names = (lookIn && lookIn.slice()) || [],
-			resolve = SourceLocator.RESOLVER,
-			resolvedFn;
+			resolve = SourceLocator.FN_RESOLVER,
+			resolvedFn,
+			namespace;
 	
 		names = names.map(function(n){
 			return n + '.' + me.meth;
@@ -156,9 +155,10 @@ SourceLocator.prototype.find = function() {
 			
 		names.unshift(me.meth); // push on front so its tried first!
 			
-		resolvedFn = window.Function('__names__', resolve.toString())(names);	
+		resolvedFn = window.Function('__names__', resolve.toString())(names);
 
 		fqName = window.__fqName__ && me.correctName(window.__fqName__);
+		namespace = fqName.replace(/\.([^.]+)$/, '');
 
 		if (resolvedFn) {
 
@@ -170,6 +170,10 @@ SourceLocator.prototype.find = function() {
 			if (/\[native code\]/.test(resolvedFn.toString())) {
 				return me.emit('failure', 'I am not allowed to show you native functions.');
 			}
+
+			if (/^function *\(\) *\{ *\}$/.test(resolvedFn.toString())) {
+				return me.emit('failure', 'Why would I show you an empty function?');
+			}
 	
 			var fnLocation = me.getFnLocation(resolvedFn.toString());
 
@@ -177,7 +181,7 @@ SourceLocator.prototype.find = function() {
 				return me.emit('failure', 'I found `'+me.meth+'` but it does not appear in the source of ' + me.lib);
 			}
 
-			log('Fn found', me.meth);
+			log('Function resolved', me.meth);
 
 			me.emit('success', {
 				source: me.source.split(/[\r\n]/).slice(fnLocation.start - 1, fnLocation.end).join('\n') || resolvedFn.toString(),
@@ -185,6 +189,8 @@ SourceLocator.prototype.find = function() {
 				start: fnLocation.start,
 				end: fnLocation.end,
 				name: fqName,
+				related: me.getRelated(window, namespace, resolvedFn),
+				namespace: namespace,
 				data: me.libData,
 				version: me.libData.get_real_version ? (
 					me.source.match(RegExp(me.libData.get_real_version)
@@ -232,5 +238,41 @@ SourceLocator.prototype.getFnLocation = function(fnString) {
 		start: start,
 		end: end
 	};
+
+};
+
+SourceLocator.prototype.getRelated = function(window, namespace, resolvedFn) {
+
+	log('Getting other fns from namespace', namespace)
+	
+	// Get other fns from namespace in [{link: '/lib/...', name: '...'}, ...] format
+
+	var ret = [],
+		lookIn = this.libData.look_in,
+		obj = window.Function('return ' + namespace)(),
+		hasOwn = window.Object().hasOwnProperty;
+
+	for (var i in obj) {
+		if (
+			obj[i] &&
+			hasOwn.call(obj, i) &&
+			obj[i] instanceof window.Function &&
+			obj[i] !== resolvedFn &&
+			!/\[native code\]/.test(obj[i].toString()) && 
+			!/^function *\(\) *\{ *\}$/.test(obj[i].toString())
+		) {
+			ret.push({
+				link: '/' + this.lib + '/' + this.ver + '/' + namespace + '.' + i,
+				name: i
+			});
+		}
+	}
+
+	// Crappy shuffling
+	ret.sort(function(a, b){
+		return Math.random() > .5 ? -1 : 1;
+	});
+
+	return ret;
 
 };

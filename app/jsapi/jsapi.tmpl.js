@@ -8,7 +8,7 @@ module.exports = function(tmpl) {
 	//
 	// todo: Add echo/print fn
 
-	var regex = /<:(=)?(.+?):>/g,
+	var regex = /~:(=)?(.+?):~/g,
 		match,
 		prevI = 0,
 		nonCode,
@@ -32,7 +32,7 @@ module.exports = function(tmpl) {
 			
 	}
 	
-	if (prevI < tmpl) {
+	if (prevI < tmpl.length) {
 		// Push in last bit (not gained from loop)
 		ret.push('s+=("' + tmpl.substring(prevI).replace(/"/g,'\\"') + '");');
 	}
