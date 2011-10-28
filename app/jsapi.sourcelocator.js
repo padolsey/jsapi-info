@@ -145,7 +145,7 @@ SourceLocator.prototype.find = function() {
 			return n + '.' + me.meth;
 		});
 			
-		names.unshift(me.meth);
+		names.unshift(me.meth); // push on front so its tried first!
 			
 		resolvedFn = window.Function('__names__', resolve.toString())(names);	
 

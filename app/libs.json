@@ -38,6 +38,15 @@
 		}
 	},
 
+	"_": "underscore",
+	"underscore": {
+		"url": "http://documentcloud.github.com/underscore/underscore.js",
+		"default_version": "",
+		"versions": [""],
+		"get_real_version": "Underscore.js (\\d+\\.\\d+\\.\\d+)",
+		"look_in": ["_"]
+	},
+
 	"yui": {
 		"url": "https://ajax.googleapis.com/ajax/libs/yui/{VERSION}/build/yui/yui.js",
 		"dom_env": true,

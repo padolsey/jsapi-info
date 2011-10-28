@@ -24,6 +24,11 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 		if (data.lib in JSAPI.libs) {
 
 			lib = JSAPI.libs[data.lib];
+			
+			if (typeof lib == 'string') {
+				// If lib is just an alias
+				lib = JSAPI.libs[lib];
+			}
 
 			if (data.ver == 'default' && lib.default_version) {
 				data.ver = lib.default_version;
