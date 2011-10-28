@@ -1,6 +1,7 @@
 {
 
 	"dojo": {
+		"name": "Dojo",
 		"url": "https://ajax.googleapis.com/ajax/libs/dojo/{VERSION}/dojo/dojo.xd.js.uncompressed.js",
 		"dom_env": true,
 		"default_version": "1.6.1",
@@ -9,7 +10,9 @@
 		"look_in": ["dojo"]
 	},
 
+	"$": "jquery",
 	"jquery": {
+		"name": "jQuery",
 		"url": "https://ajax.googleapis.com/ajax/libs/jquery/{VERSION}/jquery.js",
 		"dom_env": true,
 		"default_version": "1.6.4",
@@ -27,6 +30,7 @@
 	},
 
 	"mootools": {
+		"name": "MooTools",
 		"url": "https://ajax.googleapis.com/ajax/libs/mootools/{VERSION}/mootools.js",
 		"dom_env": true,
 		"default_version": "1.4.1",
@@ -40,6 +44,7 @@
 
 	"_": "underscore",
 	"underscore": {
+		"name": "underscore.js",
 		"url": "http://documentcloud.github.com/underscore/underscore.js",
 		"default_version": "",
 		"versions": [""],
@@ -62,6 +67,7 @@
 	},
 
 	"yui": {
+		"name": "YUI",
 		"url": "https://ajax.googleapis.com/ajax/libs/yui/{VERSION}/build/yui/yui.js",
 		"dom_env": true,
 		"default_version": "3.3.0",
@@ -71,6 +77,7 @@
 	},
 
 	"chainvas": {
+		"name": "Chainvas",
 		"url": "http://leaverou.me/chainvas/chainvas.js",
 		"dom_env": true,
 		"default_version": "",
@@ -78,6 +85,7 @@
 	},
 
 	"prefixfree": {
+		"name": "PrefixFree",
 		"url": "https://raw.github.com/LeaVerou/prefixfree/master/prefixfree.js",
 		"dom_env": true,
 		"default_version": "",

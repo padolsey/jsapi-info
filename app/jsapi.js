@@ -26,8 +26,11 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 			lib = JSAPI.libs[data.lib];
 			
 			if (typeof lib == 'string') {
-				// If lib is just an alias
-				lib = JSAPI.libs[lib];
+				// If lib is just an alias, redirect to the real thing:
+				res.writeHead(302, {
+					Location: '/' + [lib, data.ver, data.meth].join('/')
+				});
+				return res.end();
 			}
 
 			if (data.ver == 'default' && lib.default_version) {
@@ -35,8 +38,7 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 				res.writeHead(302, {
 					Location: '/' + [data.lib, data.ver, data.meth].join('/')
 				});
-				res.end();
-				return;
+				return res.end();
 			}
 
 			if (!/^[0-9A-Z.$_]+$/i.test(data.meth)) {
@@ -98,6 +100,7 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 			name: '<span>' + data.name + '</span>',
 			version: data.version,
 			lineNumbers: lineNumbers,
+			libName: libData.name,
 			source: source,
 			source_link: libData.url.replace('{VERSION}', data.version)
 		};
