@@ -1,5 +1,5 @@
 
 var http = require('http'),
-	jssrc = require('./jsapi');
+	jssrc = require('./jsapi/jsapi');
 
 http.createServer(jssrc.server).listen(8001);

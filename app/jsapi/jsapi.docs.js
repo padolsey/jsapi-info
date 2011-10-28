@@ -3,8 +3,8 @@ var events = require('events'),
 	fs = require('fs'),
 	log = require('./jsapi.log.js'),
 
-	jquery = fs.readFileSync('libs/jquery.1.6.4.js', 'utf8'),
-	jqMacroSelector  = fs.readFileSync('jquery.macroselector.js', 'utf8');
+	jquery = fs.readFileSync('./jsapi/jquery/jquery.1.6.4.js', 'utf8'),
+	jqMacroSelector  = fs.readFileSync('./jsapi/jquery/jquery.macroselector.js', 'utf8');
 
 module.exports = Docs = function() {
 	events.EventEmitter.call(this);

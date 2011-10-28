@@ -9,15 +9,15 @@ var events = require('events'),
 // when it finds the source of the function (incl. line number). It fires
 // 'failure' when it can't find it or another error occurs.
 
-module.exports = SourceLocator = function SourceLocator(lib, ver, meth, libData) {
+module.exports = SourceLocator = function SourceLocator(requestData, libData) {
 
 	events.EventEmitter.call( this );
 
 	var me = this;
 
-	this.lib = lib;
-	this.ver = ver;
-	this.meth = meth;
+	this.lib = requestData.lib;
+	this.ver = requestData.ver;
+	this.meth = requestData.meth;
 
 	// The `nullify` array will contain items that need to be nullified
 	// in order to correctly retrieve the lib's methods.
@@ -30,7 +30,7 @@ module.exports = SourceLocator = function SourceLocator(lib, ver, meth, libData)
 
 	this.libData = libData;
 
-	this.filename = './libs/' + this.lib + '.' + this.ver + '.js';
+	this.filename = './_libs/' + this.lib + '.' + this.ver + '.js';
 	
 	fs.stat(this.filename, function(err, stats) {
 		if (err && err.code === 'ENOENT') {
