@@ -5,6 +5,10 @@ var events = require('events'),
 	jsdom = require('jsdom'),
 	log = require('./jsapi.log.js');
 
+// SourceLocator takes a lib/ver/meth and fires a success event (with data)
+// when it finds the source of the function (incl. line number). It fires
+// 'failure' when it can't find it or another error occurs.
+
 module.exports = SourceLocator = function SourceLocator(lib, ver, meth, libData) {
 
 	events.EventEmitter.call( this );
@@ -29,7 +33,7 @@ module.exports = SourceLocator = function SourceLocator(lib, ver, meth, libData)
 		}
 	});
 
-}
+};
 
 SourceLocator.prototype = new events.EventEmitter;
 

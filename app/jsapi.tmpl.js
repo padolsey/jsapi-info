@@ -1,5 +1,13 @@
 module.exports = function(tmpl) {
 
+	// Returns a function which takes one `data` argument used to populate
+	// the template. Inspired by Resig's micro-templating thing. 
+	//
+	// <: ... JS goes here :>
+	// <:=output:>
+	//
+	// todo: Add echo/print fn
+
 	var regex = /<:(=)?(.+?):>/g,
 		match,
 		prevI = 0,

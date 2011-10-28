@@ -101,35 +101,6 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 			buildPage( tmplData )
 		);
 
-		return; // No docs for now
-
-		new Docs()
-			.on('failure', function(msg){
-				res.end(msg);
-			})
-			.on('success', function(descHtml, docsLink){
-
-				log('Callback from docs');
-			
-				tmplData = {
-					title: data.name,
-					name: docsLink ? '<a href="' + docsLink + '">' + data.name + '</a>' : '<span>' + data.name + '</span>',
-					version: data.version,
-					lineNumbers: lineNumbers,
-					source: source,
-					desc: descHtml,
-					source_link: libData.url.replace('{VERSION}', data.version)
-				};
-
-				res.end(
-					tmpl.replace(/\{\{([^\}]+)\}\}/g, function(m, token) {
-						return tmplData[token] || '{{NOTFOUND:' + token + '}}';
-					})
-				);
-				
-			})
-			.get(data.name, libData.documentation);
-
 	},
 
 	deTabSource: function(fnSource) {
@@ -147,10 +118,6 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 			return lines.join('\n');
 		}
 		return fnSource;
-	},
-
-	getDescription: function(name, docsData) {
-		return ;
 	},
 
 	jsdomFixes: [
