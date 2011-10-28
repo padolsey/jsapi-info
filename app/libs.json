@@ -18,7 +18,11 @@
 		"documentation": {
 			"^(?:jQuery|\\$)\\.fn\\.(.+)": "http://api.jquery.com/$1 .entry-content .desc:first",
 			"^(?:jQuery|\\$)\\.(?!fn)(.+)": "http://api.jquery.com/jQuery.$1 .entry-content .desc:first"
-		}
+		},
+		"mutate_names": [
+			["^\\$(?=\\.)", "jQuery"],
+			["^jQuery\\.prototype", "jQuery.fn"]
+		]
 	},
 
 	"mootools": {

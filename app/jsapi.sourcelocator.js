@@ -145,7 +145,7 @@ SourceLocator.prototype.find = function() {
 			
 		resolvedFn = window.Function('__names__', resolve.toString())(names);	
 
-		fqName = window.__fqName__;
+		fqName = window.__fqName__ && me.correctName(window.__fqName__);
 
 		if (resolvedFn) {
 
@@ -159,6 +159,10 @@ SourceLocator.prototype.find = function() {
 			}
 	
 			var fnLocation = me.getFnLocation(resolvedFn.toString());
+
+			if (!fnLocation) {
+				return me.emit('failure', 'I found `'+me.meth+'` but it does not appear in the source of ' + me.lib);
+			}
 
 			log('Fn found', me.meth);
 
@@ -181,17 +185,35 @@ SourceLocator.prototype.find = function() {
 
 };
 
+SourceLocator.prototype.correctName = function(fqMethodName) {
+
+	// Correct the fully-qualified name according to `mutate_names` rules spec'd in libs.json
+
+	var nameRules = this.libData.mutate_names;
+	
+	if (nameRules) {
+		for (var i = -1, l = nameRules.length; ++i < l;) {
+			fqMethodName = fqMethodName.replace( RegExp(nameRules[i][0]), nameRules[i][1] );
+		}
+	}
+
+	return fqMethodName;
+
+};
+
 SourceLocator.prototype.getFnLocation = function(fnString) {
 	//log('Getting fn location');
 
 	var sansFunc = fnString.replace(/^function *\([^\)]*\) *\{/, '');
 
 	var index = this.source.indexOf(sansFunc),
-		start = this.source.substring(0, index).match(/[\n\r]/g).length + 1,
-		end = start + (sansFunc.match(/[\n\r]/g)||[]).length;
+		start = index > -1 && this.source.substring(0, index).match(/[\n\r]/g).length + 1,
+		end = index > -1 && start + (sansFunc.match(/[\n\r]/g)||[]).length;
 
 	//log('Match', index);
 	//log('LineNumber', start, end);
+
+	if (!start) return false;
 
 	return {
 		start: start,

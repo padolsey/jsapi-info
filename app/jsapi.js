@@ -7,10 +7,10 @@ var hl = require('highlight').Highlight,
 	SourceLocator = require('./jsapi.sourcelocator.js'),
 	log = require('./jsapi.log.js'),
 	Docs = require('./jsapi.docs.js'),
+	tmpl = require('./jsapi.tmpl.js'),
 
 	libs = JSON.parse(fs.readFileSync('libs.json', 'utf-8')),
-	tmpl = fs.readFileSync('template.html', 'utf-8');
-
+	buildPage = tmpl( fs.readFileSync('template.html', 'utf-8') );
 
 
 var JSAPI = SourceLocator.JSAPI = module.exports = {
@@ -86,6 +86,22 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 		}
 
 		res.setHeader('Content-Type', 'text/html');
+
+		
+		tmplData = {
+			title: data.name,
+			name: '<span>' + data.name + '</span>',
+			version: data.version,
+			lineNumbers: lineNumbers,
+			source: source,
+			source_link: libData.url.replace('{VERSION}', data.version)
+		};
+
+		res.end(
+			buildPage( tmplData )
+		);
+
+		return; // No docs for now
 
 		new Docs()
 			.on('failure', function(msg){
