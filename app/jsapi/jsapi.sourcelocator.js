@@ -148,7 +148,7 @@ SourceLocator.prototype.find = function() {
 		log('JSDOM EnvInit errors: ', errors);
 
 		if (window.__errors__.length) {
-			log('JSDOM context errors: ', window.__errors__, 'AA::', window.__errors__[0].arguments[1]);
+			log('JSDOM context errors: ', me.requestData, window.__errors__);
 			return me.emit('failure', 'JSDOM threw me an exception. It can\'t handle your lib apparently.');
 		}
 	
