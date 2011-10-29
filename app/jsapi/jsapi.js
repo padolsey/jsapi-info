@@ -56,7 +56,7 @@ JSAPI.Request = function Request(req, res) {
 
 	} else {
 
-		res.end('Lib ' + data.lib + ' not available');
+		res.end('Lib ' + this.requestData.lib + ' not available');
 
 	}
 
@@ -66,12 +66,14 @@ JSAPI.Request.prototype = {
 
 	parseURL: function(u) {
 
-		var parts = url.parse(u).pathname.replace(/^\//, '').split('/');
+		var parsed = url.parse(u),
+			parts = parsed.pathname.replace(/^\//, '').split('/');
 
 		return {
 			lib: parts[0],
 			ver: parts.length > 2 ? parts[1] : 'default',
-			meth: parts[2] || parts[1] || '__all__'
+			meth: parts[2] || parts[1] || '__all__',
+			refresh: /refresh/.test(parsed.search)
 		};
 
 	},

@@ -33,7 +33,7 @@ module.exports = SourceLocator = function SourceLocator(requestData, libData) {
 	this.filename = './_libs/' + this.lib + '.' + this.ver + '.js';
 	
 	fs.stat(this.filename, function(err, stats) {
-		if (err && err.code === 'ENOENT') {
+		if (requestData.refresh || err && err.code === 'ENOENT') {
 			me.getRemoteSource();
 		} else if(err) {
 			this.emit('failure', 'Error on file retrieval, ' + err.code);
@@ -102,11 +102,16 @@ SourceLocator.prototype.getLocalSource = function() {
 };
 
 SourceLocator.prototype.makeEnv = function(done) {
+
+	var tryStart = 'window.__errors__ = []; try {',
+		tryEnd = '} catch(e) { window.__errors__.push(e); }';
+
 	this.env = jsdom.env({
 		html: '<div></div>',
-		src: [SourceLocator.JSAPI.jsdomFixes, this.nullify, this.source],
+		src: [SourceLocator.JSAPI.jsdomFixes, this.nullify, tryStart + this.source + tryEnd],
 		done: done
 	});
+
 };
 
 SourceLocator.FN_RESOLVER = '\
@@ -141,6 +146,11 @@ SourceLocator.prototype.find = function() {
 		run = true;
 		
 		log('JSDOM EnvInit errors: ', errors);
+
+		if (window.__errors__.length) {
+			log('JSDOM context errors: ', window.__errors__, 'AA::', window.__errors__[0].arguments[1]);
+			return me.emit('failure', 'JSDOM threw me an exception. It can\'t handle your lib apparently.');
+		}
 	
 		var lookIn = me.libData.look_in,
 			fqName,
@@ -158,9 +168,9 @@ SourceLocator.prototype.find = function() {
 		resolvedFn = window.Function('__names__', resolve.toString())(names);
 
 		fqName = window.__fqName__ && me.correctName(window.__fqName__);
-		namespace = fqName.replace(/\.([^.]+)$/, '');
+		namespace = fqName && fqName.replace(/\.([^.]+)$/, '');
 
-		if (resolvedFn) {
+		if (fqName && resolvedFn) {
 
 			if (typeof resolvedFn !== 'function') {
 				me.emit('failure', '`' + me.meth + '` is not a function. Sorry, I only know how to show you functions.');

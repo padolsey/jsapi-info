@@ -29,5 +29,20 @@
 	<p>It works by loading the library you specify into an instance of <a href="https://github.com/tmpvar/jsdom">jsdom</a>, and then evaluating the method you specify (in fully qualified form, e.g. <code>jQuery.fn.css</code>) within that instance. It then matches the <code>toString()</code> representation of that function (thanks V8!!) against the source of the library, thus determining its location. It's all operating under node.js, running via a beautiful configuration of nginx (primed to microcache!).</p>
 
 
-	<p>Brought to you by @<a href="http://twitter.com/padolsey">padolsey</a>.</p>	
+	<p>Brought to you by @<a href="http://twitter.com/padolsey">padolsey</a>.</p>
+
+	<script>
+
+		var _gaq = [['_setAccount', 'UA-3768993-10'], ['_trackPageview']];
+
+		(function(ga, s) {
+			ga.src = 'http://www.google-analytics.com/ga.js';
+			s.parentNode.insertBefore(ga, s);
+		}(
+			document.createElement('script'),
+			document.getElementsByTagName('script')[0]
+		));
+
+	</script>
+	
 </body>
