@@ -49,6 +49,15 @@ h1 {
 	border-top-right-radius: 15px;
 }
 
+#index {
+	width: 700px;
+	margin: 0 auto;
+}
+
+#index h1, #index h2 {
+	margin: 10px 0;
+}
+
 h1 a, h1 span {
 	padding: 15px;
 	display: block;
@@ -72,8 +81,26 @@ pre {
 	margin: 0;
 }
 
+#index pre, #index p {
+	padding: .6em;
+	margin: 0;
+}
+
+#donate {
+	color: #FFF;
+	background: #CC1B1B;
+}
+
 pre#lines code {
+}
+
+pre#lines a {
+	text-decoration: none;
 	color: #666;
+}
+
+pre#lines a:hover {
+	color: #FFF;
 }
 
 #desc {

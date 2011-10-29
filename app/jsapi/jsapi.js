@@ -126,7 +126,7 @@ JSAPI.Request.prototype = {
 			lineNumbers = '';
 
 		while (++line <= end) {
-			lineNumbers += line + '\n';
+			lineNumbers += '<a id="L' + line + '" href="#L' + line + '">' + line + '</a>\n';
 		}
 
 		this.response.setHeader('Content-Type', 'text/html');
