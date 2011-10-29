@@ -13,10 +13,10 @@
 	"$": "jquery",
 	"jquery": {
 		"name": "jQuery",
-		"url": "https://ajax.googleapis.com/ajax/libs/jquery/{VERSION}/jquery.js",
+		"url": "http://code.jquery.com/jquery-{VERSION}.js",
 		"dom_env": true,
 		"default_version": "1.6.4",
-		"versions": ["1", "1.1", "1.2", "1.3", "1.3.2", "1.4", "1.5", "1.6", "1.6.2", "1.6.4"],
+		"versions": ["1", "1.1", "1.2", "1.3", "1.3.2", "1.4", "1.5", "1.6", "1.6.2", "1.6.4", "git"],
 		"get_real_version": "v(\\d+\\.\\d+\\.\\d+)",
 		"look_in": ["jQuery.fn", "jQuery"],
 		"documentation": {
