@@ -19,24 +19,6 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 		new JSAPI.Request(req, res);
 	},
 
-	deTabSource: function(fnSource) {
-
-		// deTab an function string repr using the max(first,last) line's tab as a guide
-
-		var lines = fnSource.split(/[\r\n]/),
-			lastTab = lines[lines.length-1].match(/^[\s\t ]+/),
-			firstTab = lines[0].match(/^[\s\t ]+/),
-			tabRegex = lastTab && RegExp('^(?:' + firstTab + '|' + lastTab + ')');
-
-		if (lastTab) {
-			for (var i = -1, l = lines.length; ++i < l;) {
-				lines[i] = lines[i].replace(tabRegex, '');
-			}
-			return lines.join('\n');
-		}
-		return fnSource;
-	},
-
 	jsdomFixes: [
 		'navigator = window.navigator || {}',
 		'navigator.language = "en-GB"'
@@ -138,7 +120,7 @@ JSAPI.Request.prototype = {
 		
 		var line = sourceData.start - 1,
 			end = sourceData.end,
-			source = highlight( JSAPI.deTabSource(sourceData.source) ),
+			source = highlight( this.deTabSource(sourceData.source) ),
 			lineNumbers = '';
 
 		while (++line <= end) {
@@ -164,6 +146,24 @@ JSAPI.Request.prototype = {
 
 		);
 
+	},
+
+	deTabSource: function(fnSource) {
+
+		// deTab a function string repr using the max(first,last) line's tab as a guide
+
+		var lines = fnSource.split(/[\r\n]/),
+			lastTab = lines[lines.length-1].match(/^[\s\t ]+/),
+			firstTab = lines[0].match(/^[\s\t ]+/),
+			tabRegex = lastTab && RegExp('^(?:' + firstTab + '|' + lastTab + ')');
+
+		if (lastTab) {
+			for (var i = -1, l = lines.length; ++i < l;) {
+				lines[i] = lines[i].replace(tabRegex, '');
+			}
+			return lines.join('\n');
+		}
+		return fnSource;
 	},
 
 	getDocumentationLink: function(fullyQualifiedMethodName) {
