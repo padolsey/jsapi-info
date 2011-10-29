@@ -1,13 +1,12 @@
 
-var highlight = require('highlight').Highlight,
-
-	fs = require('fs'),
+var fs = require('fs'),
 	url = require('url'),
 
 	SourceLocator = require('./jsapi.sourcelocator.js'),
 	log = require('./jsapi.log.js'),
 	Docs = require('./jsapi.docs.js'),
 	tmpl = require('./jsapi.tmpl.js'),
+	highlight = require('./jsapi.highlight.js'),
 
 	libs = JSON.parse(fs.readFileSync('./libs.json', 'utf-8')),
 	buildPage = tmpl( fs.readFileSync('./templates/source-page.html', 'utf-8') );
@@ -22,13 +21,14 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 
 	deTabSource: function(fnSource) {
 
-		// deTab an function string repr using the last line's tab as a guide
+		// deTab an function string repr using the max(first,last) line's tab as a guide
 
 		var lines = fnSource.split(/[\r\n]/),
-			tab = lines[lines.length-1].match(/^[\s\t ]+/),
-			tabRegex = tab && RegExp('^' + tab);
+			lastTab = lines[lines.length-1].match(/^[\s\t ]+/),
+			firstTab = lines[0].match(/^[\s\t ]+/),
+			tabRegex = lastTab && RegExp('^(?:' + firstTab + '|' + lastTab + ')');
 
-		if (tab) {
+		if (lastTab) {
 			for (var i = -1, l = lines.length; ++i < l;) {
 				lines[i] = lines[i].replace(tabRegex, '');
 			}

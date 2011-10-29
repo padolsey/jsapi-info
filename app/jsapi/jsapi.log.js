@@ -1,6 +1,6 @@
 module.exports = function() {
 	var args = [].slice.call(arguments);
-	args.unshift('>> JSSRC:: ');
+	args.unshift('>> JSAPI:: ');
 	console.log.apply(console, args);
 };
 
