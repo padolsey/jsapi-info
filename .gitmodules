@@ -1,0 +1,3 @@
+[submodule "Zeon"]
+	path = app/jsapi/Zeon
+	url = https://github.com/qfox/Zeon.git
