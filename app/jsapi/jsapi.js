@@ -17,12 +17,7 @@ var JSAPI = SourceLocator.JSAPI = module.exports = {
 
 	server: function(req, res) {
 		new JSAPI.Request(req, res);
-	},
-
-	jsdomFixes: [
-		'navigator = window.navigator || {}',
-		'navigator.language = "en-GB"'
-	].join(';')
+	}
 
 };
 
@@ -93,7 +88,7 @@ JSAPI.Request.prototype = {
 
 		}
 
-		if (data.ver == 'default' && lib.default_version) {
+		if (data.ver === 'default' && lib.default_version) {
 
 			data.ver = lib.default_version;
 			this.response.writeHead(302, {
@@ -105,7 +100,7 @@ JSAPI.Request.prototype = {
 		}
 
 		if (!/^[0-9A-Z.$_]+$/i.test(data.meth)) {
-			this.response.end('Your API method/namespace must conform with /^[0-9A-Z.$_]+$/i');
+			this.response.end('Your API method/namespace must match /^[0-9A-Z.$_]+$/i');
 			return false;
 		}
 
@@ -119,6 +114,16 @@ JSAPI.Request.prototype = {
 	},
 
 	output: function(sourceData) {
+		if (sourceData.source) {
+			this.outputSource(sourceData);
+		}
+	},
+
+	outputMethodList: function(sourceData) {
+		this.response.end('Method list');
+	},
+
+	outputSource: function(sourceData) {
 		
 		var line = sourceData.start - 1,
 			end = sourceData.end,
