@@ -152,67 +152,102 @@ SourceLocator.prototype.find = function() {
 			return me.emit('failure', 'JSDOM threw me an exception. It can\'t handle your lib apparently.');
 		}
 	
-		var lookIn = me.libData.look_in,
-			fqName,
-			names = (lookIn && lookIn.slice()) || [],
-			resolve = SourceLocator.FN_RESOLVER,
-			resolvedFn,
-			namespace;
-	
-		names = names.map(function(n){
-			return n + '.' + me.meth;
-		});
-			
-		names.unshift(me.meth); // push on front so its tried first!
-			
-		resolvedFn = window.Function('__names__', resolve.toString())(names);
+		var resolved = me.resolveMethod(window),
+			location = resolved.location;
 
-		fqName = window.__fqName__ && me.correctName(window.__fqName__);
-		namespace = fqName && fqName.replace(/\.([^.]+)$/, '');
+		if (resolved.fullyQualifiedName && resolved.method) {
 
-		if (fqName && resolvedFn) {
+			if (me.validateMethod(resolved)) {
 
-			if (typeof resolvedFn !== 'function') {
-				me.emit('failure', '`' + me.meth + '` is not a function. Sorry, I only know how to show you functions.');
-				return;
+				log('Function resolved', me.meth);
+
+				me.emit('success', {
+
+					source: me.source.split(/[\r\n]/).slice(location.start - 1, location.end).join('\n') || resolved.string,
+					full_source: me.source,
+
+					start: location.start,
+					end: location.end,
+
+					name: resolved.fullyQualfiedName,
+					namespace: resolved.namespace,
+
+					related: me.getRelated(window, resolved.namespace, resolved.method),
+
+					// Grab the real version directly from the source
+					// (if we're given a `get_real_version` regex to work with)
+					version: me.libData.get_real_version ? (
+						me.source.match(RegExp(me.libData.get_real_version)
+					) || [,me.ver])[1] : me.ver
+
+				});
+
 			}
-
-			if (/\[native code\]/.test(resolvedFn.toString())) {
-				return me.emit('failure', 'I am not allowed to show you native functions.');
-			}
-
-			if (/^function *\(\) *\{ *\}$/.test(resolvedFn.toString())) {
-				return me.emit('failure', 'Why would I show you an empty function?');
-			}
-	
-			var fnLocation = me.getFnLocation(resolvedFn.toString());
-
-			if (!fnLocation) {
-				return me.emit('failure', 'I found `'+me.meth+'` but it does not appear in the source of ' + me.lib);
-			}
-
-			log('Function resolved', me.meth);
-
-			me.emit('success', {
-				source: me.source.split(/[\r\n]/).slice(fnLocation.start - 1, fnLocation.end).join('\n') || resolvedFn.toString(),
-				full_source: me.source,
-				start: fnLocation.start,
-				end: fnLocation.end,
-				name: fqName,
-				related: me.getRelated(window, namespace, resolvedFn),
-				namespace: namespace,
-				data: me.libData,
-				version: me.libData.get_real_version ? (
-					me.source.match(RegExp(me.libData.get_real_version)
-				) || [,me.ver])[1] : me.ver
-			});
-	
+		
 		} else {
 			me.emit('failure', '`' + me.meth + '` not found :(');
 		}
 	});
 
 };
+
+SourceLocator.prototype.resolveMethod = function(window) {
+
+	var me = this,
+		lookIn = this.libData.look_in,
+		fqName,
+		names = (lookIn && lookIn.slice()) || [],
+		resolver = SourceLocator.FN_RESOLVER,
+		resolved,
+		namespace;
+
+	names = names.map(function(n){
+		return n + '.' + me.meth;
+	});
+		
+	names.unshift(me.meth); // push meth on front so its tried first!
+	
+	resolved = window.Function('__names__', resolver.toString())(names);
+
+	fqName = window.__fqName__ && this.correctName(window.__fqName__);
+
+	namespace = fqName && fqName.replace(/\.([^.]+)$/, '');
+
+	return {
+		fullyQualifiedName: fqName,
+		namespace: namespace,
+		method: resolved,
+		string: resolved.toString(),
+		location: me.getFnLocation(resolved.toString())
+	};
+
+};
+
+SourceLocator.prototype.validateMethod = function(resolved) {
+
+	if (typeof resolved.method !== 'function') {
+		this.emit('failure', '`' + this.meth + '` is not a function. Sorry, I only know how to show you functions.');
+		return false;
+	}
+
+	if (/\[native code\]/.test(resolved.string)) {
+		this.emit('failure', 'I am not allowed to show you native functions.');
+		return false;
+	}
+
+	if (/^function *\(\) *\{ *\}$/.test(resolved.string)) {
+		this.emit('failure', 'Why would I show you an empty function?');
+		return false;
+	}
+
+	if (!resolved.location) {
+		this.emit('failure', 'I found `'+this.meth+'` but it does not appear in the source of ' + this.lib);
+		return false;
+	}
+
+	return true;
+
+}
 
 SourceLocator.prototype.correctName = function(fqMethodName) {
 
