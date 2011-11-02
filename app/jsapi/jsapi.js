@@ -131,6 +131,8 @@ JSAPI.Request.prototype = {
 
 		this.response.setHeader('Content-Type', 'text/html');
 
+		source = this.linkifySource(source);
+
 		this.response.end(
 
 			buildPage({
@@ -146,6 +148,34 @@ JSAPI.Request.prototype = {
 				name: 			sourceData.name
 			})
 
+		);
+
+	},
+
+	linkifySource: function(source) {
+
+		var me = this;
+		
+		return source.replace(
+			RegExp(
+
+				SourceLocator.LINKIFY_MARKER[0] +
+
+				// avoid stuff with elements within (this should not happen anyway
+				// since LINKIFY_MARKERs are not highlighted my `highlight`)
+				'([^<>]+?)' + 
+
+				SourceLocator.LINKIFY_MARKER[1],
+
+				'g'
+			),
+			function($0, name) {
+				return '<a href="/' + [me.requestData.lib, me.requestData.ver, name].join('/') + '">' + name + '</a>';
+			}
+		).replace(
+			// Just in-case any LINKIFY_MARKERs are left, remove them:
+			RegExp(SourceLocator.LINKIFY_MARKER[0] + '|' + SourceLocator.LINKIFY_MARKER[1], 'g'),
+			''
 		);
 
 	},

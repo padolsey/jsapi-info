@@ -163,13 +163,28 @@ SourceLocator.prototype.find = function() {
 
 				me.emit('success', {
 
-					source: me.source.split(/[\r\n]/).slice(location.start - 1, location.end).join('\n') || resolved.string,
+					source: me.linkifySource(
+
+						window,
+
+						// Try to use actual source, not just toString'd function.
+						me.source
+							.split(/[\r\n]/)
+							.slice(
+								location.start - 1,
+								location.end
+							)
+							.join('\n')
+						|| resolved.string
+
+					),
+
 					full_source: me.source,
 
 					start: location.start,
 					end: location.end,
 
-					name: resolved.fullyQualfiedName,
+					name: resolved.fullyQualifiedName,
 					namespace: resolved.namespace,
 
 					related: me.getRelated(window, resolved.namespace, resolved.method),
@@ -191,9 +206,9 @@ SourceLocator.prototype.find = function() {
 
 };
 
-SourceLocator.prototype.resolveMethod = function(window) {
+SourceLocator.prototype.resolveMethod = function(window, method) {
 
-	var me = this,
+	var method = method || this.meth,
 		lookIn = this.libData.look_in,
 		fqName,
 		names = (lookIn && lookIn.slice()) || [],
@@ -202,10 +217,10 @@ SourceLocator.prototype.resolveMethod = function(window) {
 		namespace;
 
 	names = names.map(function(n){
-		return n + '.' + me.meth;
+		return n + '.' + method;
 	});
 		
-	names.unshift(me.meth); // push meth on front so its tried first!
+	names.unshift(method); // push meth on front so its tried first!
 	
 	resolved = window.Function('__names__', resolver.toString())(names);
 
@@ -217,31 +232,33 @@ SourceLocator.prototype.resolveMethod = function(window) {
 		fullyQualifiedName: fqName,
 		namespace: namespace,
 		method: resolved,
-		string: resolved.toString(),
-		location: me.getFnLocation(resolved.toString())
+		string: resolved && resolved.toString(),
+		location: resolved && this.getFnLocation(resolved.toString())
 	};
 
 };
 
-SourceLocator.prototype.validateMethod = function(resolved) {
+SourceLocator.prototype.validateMethod = function(resolved, emit) {
+
+	if (emit === void 0) emit = true;
 
 	if (typeof resolved.method !== 'function') {
-		this.emit('failure', '`' + this.meth + '` is not a function. Sorry, I only know how to show you functions.');
+		emit && this.emit('failure', '`' + this.meth + '` is not a function. Sorry, I only know how to show you functions.');
 		return false;
 	}
 
 	if (/\[native code\]/.test(resolved.string)) {
-		this.emit('failure', 'I am not allowed to show you native functions.');
+		emit && this.emit('failure', 'I am not allowed to show you native functions.');
 		return false;
 	}
 
 	if (/^function *\(\) *\{ *\}$/.test(resolved.string)) {
-		this.emit('failure', 'Why would I show you an empty function?');
+		emit && this.emit('failure', 'Why would I show you an empty function?');
 		return false;
 	}
 
 	if (!resolved.location) {
-		this.emit('failure', 'I found `'+this.meth+'` but it does not appear in the source of ' + this.lib);
+		emit && this.emit('failure', 'I found `'+this.meth+'` but it does not appear in the source of ' + this.lib);
 		return false;
 	}
 
@@ -319,5 +336,35 @@ SourceLocator.prototype.getRelated = function(window, namespace, resolvedFn) {
 	});
 
 	return ret;
+
+};
+
+SourceLocator.LINKIFY_MARKER = ['@@##__', '__##@@'];
+SourceLocator.prototype.linkifySource = function(window, source) {
+
+	// Locate and linkify other methods within source (add marker for linkification)
+	
+	var me = this,
+		lookIn = '(?:' + this.libData.look_in.join('|')
+				// Escape all except '|' which we need...
+				.replace(/[-[\]{}()*+?.,\\^$#\s]/g, "\\$&") + ')';
+
+	return source.replace(
+
+		RegExp(lookIn + '\.([a-zA-Z0-9$_]+)', 'g'),
+
+		function($0, name) {
+			
+			var resolved = me.resolveMethod(window, name);
+
+			if ( me.validateMethod(resolved, false /* don't emit */) ) {
+				return SourceLocator.LINKIFY_MARKER[0] + $0 + SourceLocator.LINKIFY_MARKER[1];
+			}
+
+			return $0;
+
+		}
+
+	);
 
 };
