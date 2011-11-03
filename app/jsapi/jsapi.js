@@ -2,16 +2,17 @@
 var fs = require('fs'),
 	url = require('url'),
 
-	SourceLocator = require('./jsapi.sourcelocator.js'),
+	SourceHandler = require('./jsapi.sourcehandler.js'),
 	log = require('./jsapi.log.js'),
 	Docs = require('./jsapi.docs.js'),
 	tmpl = require('./jsapi.tmpl.js'),
 	highlight = require('./jsapi.highlight.js'),
 
 	libs = JSON.parse(fs.readFileSync('./libs.json', 'utf-8')),
-	buildPage = tmpl( fs.readFileSync('./templates/source-page.html', 'utf-8') );
+	buildMethodsPage = tmpl( fs.readFileSync('./templates/methods-page.html', 'utf-8') ),
+	buildSourcePage = tmpl( fs.readFileSync('./templates/source-page.html', 'utf-8') );
 
-var JSAPI = SourceLocator.JSAPI = module.exports = {
+var JSAPI = SourceHandler.JSAPI = module.exports = {
 
 	libs: libs,
 
@@ -37,10 +38,17 @@ JSAPI.Request = function Request(req, res) {
 
 		if (this.validateRequest()) {
 
-			this.sourceLocator = new SourceLocator(this.requestData, this.lib);
+			this.sourceLocator = new SourceHandler(this.requestData, this.lib);
 
 			this.sourceLocator
-				.on('success', function(sourceData){
+				.on('ready', function(){
+					if (me.requestData.meth === '__all__') {
+						this.findAllMethods();
+					} else {
+						this.findSingleMethod(me.requestData.meth);
+					}
+				})
+				.on('sourceData', function(sourceData){
 					me.output(sourceData);
 				})
 				.on('failure', function(e){
@@ -66,8 +74,8 @@ JSAPI.Request.prototype = {
 
 		return {
 			lib: parts[0],
-			ver: parts.length > 2 ? parts[1] : 'default',
-			meth: parts[2] || parts[1] || '__all__',
+			ver: /^\d+/.test(parts[1]) ? parts[1] : 'default',
+			meth: (/^\d+/.test(parts[1]) ? parts[2] : parts[1]) || '__all__',
 			refresh: /refresh/.test(parsed.search)
 		};
 
@@ -114,18 +122,38 @@ JSAPI.Request.prototype = {
 	},
 
 	output: function(sourceData) {
-		if (sourceData.source) {
+		if (sourceData.from === 'findSingleMethod') {
 			this.outputSource(sourceData);
+		} else if (sourceData.from === 'findAllMethods') {
+			this.outputMethodList(sourceData);
 		}
 	},
 
 	outputMethodList: function(sourceData) {
-		this.response.end('Method list');
+
+		this.response.setHeader('Content-Type', 'text/html');
+
+		this.response.end(
+
+			buildMethodsPage({
+
+				title: 			this.lib.name + ' API',
+				version: 		sourceData.version,
+				libName: 		this.lib.name,
+				source_link: 	this.lib.url.replace('{VERSION}', sourceData.version),
+
+				methods: 		sourceData.methods
+				
+			})
+
+		);
+
 	},
 
 	outputSource: function(sourceData) {
 		
-		var line = sourceData.start - 1,
+		var me = this,
+			line = sourceData.start - 1,
 			end = sourceData.end,
 			source = highlight( this.deTabSource(sourceData.source) ),
 			lineNumbers = '';
@@ -138,19 +166,36 @@ JSAPI.Request.prototype = {
 
 		source = this.linkifySource(source);
 
+		sourceData.related.push({
+			name: '(More...)',
+			link: '/' + this.requestData.lib + '/' + this.requestData.ver
+		});
+
 		this.response.end(
 
-			buildPage({
+			buildSourcePage({
+
 				title: 			sourceData.name,
 				version: 		sourceData.version,
 				lineNumbers: 	lineNumbers,
 				libName: 		this.lib.name,
 				docLink: 		this.getDocumentationLink(sourceData.name),
-				related: 		sourceData.related,
+
+				related: 		sourceData.related.map(function(item){
+
+									if (!item.link) item.link =
+										'/' + me.requestData.lib +
+										'/' + me.requestData.ver +
+										'/' + item.fullyQualifiedName;
+									
+									return item;
+								}),
+
 				namespace: 		sourceData.namespace,
 				source: 		source,
 				source_link: 	this.lib.url.replace('{VERSION}', sourceData.version),
 				name: 			sourceData.name
+				
 			})
 
 		);
@@ -164,13 +209,13 @@ JSAPI.Request.prototype = {
 		return source.replace(
 			RegExp(
 
-				SourceLocator.LINKIFY_MARKER[0] +
+				SourceHandler.LINKIFY_MARKER[0] +
 
 				// avoid stuff with elements within (this should not happen anyway
 				// since LINKIFY_MARKERs are not highlighted my `highlight`)
 				'([^<>]+?)' + 
 
-				SourceLocator.LINKIFY_MARKER[1],
+				SourceHandler.LINKIFY_MARKER[1],
 
 				'g'
 			),
@@ -179,7 +224,7 @@ JSAPI.Request.prototype = {
 			}
 		).replace(
 			// Just in-case any LINKIFY_MARKERs are left, remove them:
-			RegExp(SourceLocator.LINKIFY_MARKER[0] + '|' + SourceLocator.LINKIFY_MARKER[1], 'g'),
+			RegExp(SourceHandler.LINKIFY_MARKER[0] + '|' + SourceHandler.LINKIFY_MARKER[1], 'g'),
 			''
 		);
 
