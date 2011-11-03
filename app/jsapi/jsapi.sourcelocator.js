@@ -288,7 +288,7 @@ SourceLocator.prototype.getFnLocation = function(fnString) {
 	var sansFunc = fnString.replace(/^function *\([^\)]*\) *\{/, '');
 
 	var index = this.source.indexOf(sansFunc),
-		start = index > -1 && this.source.substring(0, index).match(/[\n\r]/g).length + 1,
+		start = index > -1 && (this.source.substring(0, index).match(/[\n\r]/g)||[]).length + 1,
 		end = index > -1 && start + (sansFunc.match(/[\n\r]/g)||[]).length;
 
 	//log('Match', index);
