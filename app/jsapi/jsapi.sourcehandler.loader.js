@@ -1,5 +1,7 @@
 var events = require('events'),
 	fs = require('fs'),
+	url = require('url'),
+	http = require('http'),
 	log = require('./jsapi.log.js');
 
 /**

@@ -19,3 +19,7 @@ A JS library source inspector. Libraries are specified in `libs.json`, e.g.
 Given the above configuration, we can now access `/jquery/[VERSION/]METHOD_NAME` in our browser. JSAPI.info will only source the jQuery source file remotely (from googleapis) if it hasn't already cached it locally. 
 
 THIS IS STILL UNDER DEVELOPMENT: Live @ [jsapi.info](http://jsapi.info).
+
+### How does it work?
+
+It works by loading the library you specify into an instance of [jsdom](https://github.com/tmpvar/jsdom), and then evaluating the method you specify (in fully qualified form, e.g. `jQuery.fn.css`) within that instance. It then matches the `toString()` representation of that function (thanks V8!!) against the source of the library, thus determining its location. It's all operating under node.js, running via a beautiful configuration of nginx (primed to microcache!) on a linode box somewhere in London.

@@ -3,6 +3,8 @@ body {
 	font-size: .8em;
 	font-family: sans-serif;
 	background: #FFF;
+	max-width: 1200px;
+	margin: 0 auto;
 }
 
 pre, code {
@@ -25,7 +27,6 @@ a:hover, a:focus {
 a#home {
 	text-transform: lowercase;
 	padding: 15px 25px;
-	margin-bottom: 5px;
 	float: right;
 	font-size: 1.3em;
 	background: #333;
@@ -49,7 +50,7 @@ h1 {
 	border-top-right-radius: 15px;
 }
 
-#index {
+body#index {
 	width: 700px;
 	margin: 0 auto;
 }
@@ -65,11 +66,28 @@ h1 a, h1 span {
 	border-top-right-radius: 15px;
 }
 
-h2 {
+h1 a {
+	text-decoration: none;
+}
+
+h2, #meta {
 	margin: 0 0 10px;
 	font-size: 1.2em;
 	padding: 10px;
 	background: #EEE;
+	clear: both;
+}
+
+#meta {
+	overflow: hidden;
+}
+
+#meta .lib {
+	float: right;
+}
+
+#meta .meth {
+	float: left;
 }
 
 body pre code {
@@ -86,9 +104,27 @@ pre {
 	margin: 0;
 }
 
+#explore {
+	font-size: 1.3em;
+	margin: 10px 0;
+	padding: 0;
+	list-style: none;
+}
+
+#explore li a {
+	padding: 15px;
+	display: block;
+	margin: 1px 0;
+	background: #BDE9FF;
+	text-decoration: none;
+}
+
+#explore a:hover, #explore a:focus {
+	color: #EEE;
+	background: #1B91CC;
+}
+
 #donate {
-	color: #FFF;
-	background: #CC1B1B;
 }
 
 pre#lines code {

@@ -24,9 +24,16 @@
 		</div>
 	~: } :~
 
-	<h2>
-		~:= libName :~ (~:= version :~) - see <a href="~:=source_link:~">full source</a>
-	</h2>
+	<div id="meta">
+		<div class="meth">
+			~: if (data.docLink) { :~
+				<a href="~:= docLink :~">See documentation for <code>~:= name :~</code> &raquo;</a>
+			~: } :~
+		</div>
+		<div class="lib">
+			~:= libName :~ (~:= version :~) - see <a href="~:=source_link:~">full source</a>
+		</div>
+	</div>
 
 	~: if (data.related) { :~
 		<div id="related">

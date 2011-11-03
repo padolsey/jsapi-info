@@ -70,12 +70,25 @@ JSAPI.Request.prototype = {
 	parseURL: function(u) {
 
 		var parsed = url.parse(u),
-			parts = parsed.pathname.replace(/^\//, '').split('/');
+			parts = parsed.pathname.replace(/^\//, '').split('/'),
+			lib = parts[0].toLowerCase(),
+
+			isVersion = function(v) {
+				return lib && (
+					/^\d+|^default/.test(v) || (lib.versions && lib.versions.indexOf(v) > -1)
+				);
+			};
+		
+		lib = JSAPI.libs[lib];
+
+		if (typeof lib == 'string') {
+			lib = JSAPI.libs[lib];
+		}
 
 		return {
 			lib: parts[0],
-			ver: /^\d+/.test(parts[1]) ? parts[1] : 'default',
-			meth: (/^\d+/.test(parts[1]) ? parts[2] : parts[1]) || '__all__',
+			ver: isVersion(parts[1]) ? parts[1] : 'default',
+			meth: (isVersion(parts[1]) ? parts[2] : parts[1]) || '__all__',
 			refresh: /refresh/.test(parsed.search)
 		};
 
@@ -89,7 +102,7 @@ JSAPI.Request.prototype = {
 
 			// If lib is just an alias, redirect to the real thing:
 			this.response.writeHead(302, {
-				Location: '/' + [lib, data.ver, data.meth].join('/')
+				Location: '/' + lib + '/' + data.ver + '/' + (data.meth === '__all__' ? '' : data.meth + '/')
 			});
 			this.response.end();
 			return false;
@@ -100,7 +113,7 @@ JSAPI.Request.prototype = {
 
 			data.ver = lib.default_version;
 			this.response.writeHead(302, {
-				Location: '/' + [data.lib, data.ver, data.meth].join('/')
+				Location: '/' + data.lib + '/' + data.ver + '/' + (data.meth === '__all__' ? '' : data.meth + '/')
 			});
 			this.response.end();
 			return false;
