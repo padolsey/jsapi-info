@@ -92,7 +92,7 @@ JSAPI.Request.prototype = {
 			ver: isVersion(parts[1]) ? parts[1] : 'default',
 			meth: (isVersion(parts[1]) ? parts[2] : parts[1]) || '__all__',
 			refresh: /refresh/.test(parsed.search),
-			expand: Math.min(50, +(parsed.search.match(/expand=(\d+)/)||[,0])[1])
+			expand: ~~Math.min(50, +(parsed.search.match(/expand=(\d+)/)||[,0])[1])
 		};
 
 	},
