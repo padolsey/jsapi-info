@@ -2,4 +2,4 @@
 var http = require('http'),
 	jssrc = require('./jsapi/jsapi');
 
-http.createServer(jssrc.server).listen(3030);
+http.createServer(jssrc.server).listen(8001);

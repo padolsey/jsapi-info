@@ -184,13 +184,28 @@ JSAPI.Request.prototype = {
 		source = highlight(source);
 		source = this.linkifySource(source);
 
-		// Mark the real source
+		// If the user has accessed the page with expand=N, then we are going to show
+		// the function source but expanded by N into the actual source.
+		// E.g. expand=1, will make shownLinesStart-=1, and shownLinesEnd+=1
+		// --
+		// We need to mark the actual function source within an expanded view
+		// with <span class=real_source>. 
 		if (sourceData.function_start !== 0) {
+
 			// (if the shown source is expanded, i.e. does not start with actual function)
 			source = source.split(/\n/);
 			source[sourceData.function_start] = '<span class="real_source">' + source[sourceData.function_start];
-			source[sourceData.function_end] = source[sourceData.function_end] + '</span>';
+
+			// If function_end isn't the last line then insert </span> on NEXT line, to prevent
+			// additional newline (SPAN is block level element.)
+			if (sourceData.function_end == source.length - 1 /* is last line */) {
+				source[sourceData.function_end] = source[sourceData.function_end] + '</span>';
+			} else {
+				source[sourceData.function_end + 1] = '</span>' + source[sourceData.function_end + 1];
+			}
+
 			source = source.join('\n');
+
 		}
 
 		// Insert blank space in empty lines (so <pre> breaks correctly.)
@@ -291,7 +306,6 @@ JSAPI.Request.prototype = {
 
 		if (minTab) {
 			for (var i = -1, l = lines.length; ++i < l;) {
-				console.log('Line', lines[i], tabRegex.test(lines[i]));
 				lines[i] = lines[i].replace(tabRegex, '');
 			}
 			return lines.join('\n');
