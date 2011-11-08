@@ -140,8 +140,10 @@ pre#lines a:hover {
 }
 
 pre .real_source {
-	background: yellow;
+	background: #FFFC96;
 	display: block;
+	margin: 0 -10px;
+	padding: 0 10px;
 }
 
 #desc {

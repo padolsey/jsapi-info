@@ -67,17 +67,19 @@ function SourceHandler(requestData, libData) {
 SourceHandler.prototype = new events.EventEmitter;
 
 SourceHandler.LINKIFY_MARKER = ['@@##__', '__##@@'];
-SourceHandler.BEGIN_END_MARKER = ['@@BEGIN##__', '__##END@@'];
 
 SourceHandler.prototype.findSingleMethod = function(method) {
 
 	var resolved = this.resolver.resolve(method),
 		location = resolved.location,
-		start = location.start,
-		end = location.end,
+		start,
+		end,
 		source;
 
 	if (resolved && resolved.fullyQualifiedName && resolved.method) {
+
+		start = location.start;
+		end = location.end;
 
 		if (this.validateMethod(resolved)) {
 
