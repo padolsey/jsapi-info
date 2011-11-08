@@ -153,7 +153,7 @@ JSAPI.Request.prototype = {
 				title: 			this.lib.name + ' API',
 				version: 		sourceData.version,
 				libName: 		this.lib.name,
-				source_link: 	this.lib.url.replace('{VERSION}', sourceData.version),
+				source_link: 	this.lib.url.replace('{VERSION}', this.requestData.ver),
 
 				methods: 		sourceData.methods
 				
@@ -206,7 +206,7 @@ JSAPI.Request.prototype = {
 
 				namespace: 		sourceData.namespace,
 				source: 		source,
-				source_link: 	this.lib.url.replace('{VERSION}', sourceData.version),
+				source_link: 	this.lib.url.replace('{VERSION}', this.requestData.ver),
 				name: 			sourceData.name
 				
 			})
