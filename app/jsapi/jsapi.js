@@ -85,11 +85,14 @@ JSAPI.Request.prototype = {
 			lib = JSAPI.libs[lib];
 		}
 
+		parsed.search = parsed.search || '';
+
 		return {
 			lib: parts[0],
 			ver: isVersion(parts[1]) ? parts[1] : 'default',
 			meth: (isVersion(parts[1]) ? parts[2] : parts[1]) || '__all__',
-			refresh: /refresh/.test(parsed.search)
+			refresh: /refresh/.test(parsed.search),
+			expand: +(parsed.search.match(/expand=(\d+)/)||[,0])[1]
 		};
 
 	},
@@ -168,7 +171,7 @@ JSAPI.Request.prototype = {
 		var me = this,
 			line = sourceData.start - 1,
 			end = sourceData.end,
-			source = highlight( this.deTabSource(sourceData.source) ),
+			source = sourceData.source,
 			lineNumbers = '';
 
 		while (++line <= end) {
@@ -177,7 +180,21 @@ JSAPI.Request.prototype = {
 
 		this.response.setHeader('Content-Type', 'text/html');
 
+		source = this.deTabSource(source);
+		source = highlight(source);
 		source = this.linkifySource(source);
+
+		// Mark the real source
+		if (sourceData.function_start !== 0) {
+			// (if the shown source is expanded, i.e. does not start with actual function)
+			source = source.split(/\n/);
+			source[sourceData.function_start] = '<span class="real_source">' + source[sourceData.function_start];
+			source[sourceData.function_end] = source[sourceData.function_end] + '</span>';
+			source = source.join('\n');
+		}
+
+		// Insert blank space in empty lines (so <pre> breaks correctly.)
+		source = source.replace(/(\n)(\n|$)/g, '$1 $2');
 
 		sourceData.related.push({
 			name: '(More...)',
@@ -243,22 +260,45 @@ JSAPI.Request.prototype = {
 
 	},
 
+	highlightRealSource: function(source) {
+		return source.replace(
+			SourceHandler.BEGIN_END_MARKER[0],
+			'<span class="real_source">'
+		).replace(
+			SourceHandler.BEGIN_END_MARKER[1],
+			'</span>'
+		);
+	},
+
 	deTabSource: function(fnSource) {
 
-		// deTab a function string repr using the max(first,last) line's tab as a guide
+		// deTab a function string repr using the min found tab across all lines
 
 		var lines = fnSource.split(/[\r\n]/),
-			lastTab = lines[lines.length-1].match(/^[\s\t ]+/),
-			firstTab = lines[0].match(/^[\s\t ]+/),
-			tabRegex = lastTab && RegExp('^(?:' + firstTab + '|' + lastTab + ')');
+			minTab = Infinity,
+			tabRegex;
 
-		if (lastTab) {
+		lines.forEach(function(l){
+			if (!l) return;
+			var tabs = l.match(/^\t+/);
+			if (tabs = tabs && tabs[0]) {
+				tabs = tabs.split('').length;
+				minTab = Math.min(minTab, tabs);
+			} else minTab = 0;
+		});
+
+		tabRegex = RegExp('^\\t{'+minTab+'}');
+
+		if (minTab) {
 			for (var i = -1, l = lines.length; ++i < l;) {
+				console.log('Line', lines[i], tabRegex.test(lines[i]));
 				lines[i] = lines[i].replace(tabRegex, '');
 			}
 			return lines.join('\n');
 		}
+
 		return fnSource;
+
 	},
 
 	getDocumentationLink: function(fullyQualifiedMethodName) {

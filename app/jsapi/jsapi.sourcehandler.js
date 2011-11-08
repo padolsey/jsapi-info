@@ -21,6 +21,7 @@ function SourceHandler(requestData, libData) {
 
 	var me = this;
 
+	this.expandSourceN = requestData.expand;
 	this.lib = requestData.lib;
 	this.ver = requestData.ver;
 	this.meth = requestData.meth;
@@ -65,10 +66,16 @@ function SourceHandler(requestData, libData) {
 
 SourceHandler.prototype = new events.EventEmitter;
 
+SourceHandler.LINKIFY_MARKER = ['@@##__', '__##@@'];
+SourceHandler.BEGIN_END_MARKER = ['@@BEGIN##__', '__##END@@'];
+
 SourceHandler.prototype.findSingleMethod = function(method) {
 
 	var resolved = this.resolver.resolve(method),
-		location = resolved.location;
+		location = resolved.location,
+		start = location.start,
+		end = location.end,
+		source;
 
 	if (resolved && resolved.fullyQualifiedName && resolved.method) {
 
@@ -82,28 +89,29 @@ SourceHandler.prototype.findSingleMethod = function(method) {
 				return Math.random() > .5 ? -1 : 1;
 			});
 
+			// Change start/end to take `expand` into account:
+			if (this.expandSourceN) {
+				start = Math.max(1, start - this.expandSourceN);
+				end += this.expandSourceN;
+			}
+
+			// Grab the bit of source we want to show from the entire source:
+			source = this.source.split(/[\r\n]/);
+			source = source.slice(start - 1, end).join('\n');
+
 			this.emit('sourceData', {
 
 				from: 'findSingleMethod',
 
-				source: this.linkifySource(
-
-					// Try to use actual source, not just toString'd function.
-					this.source
-						.split(/[\r\n]/)
-						.slice(
-							location.start - 1,
-							location.end
-						)
-						.join('\n')
-					|| resolved.string
-
-				),
+				source: this.linkifySource(source),
 
 				full_source: this.source,
 
-				start: location.start,
-				end: location.end,
+				start: start,
+				end: end,
+
+				function_start: location.start - start,
+				function_end: (location.start - start) + (location.end - location.start),
 
 				name: resolved.fullyQualifiedName,
 				namespace: resolved.namespace,
@@ -192,7 +200,6 @@ SourceHandler.prototype.validateMethod = function(resolved, emit) {
 
 };
 
-SourceHandler.LINKIFY_MARKER = ['@@##__', '__##@@'];
 SourceHandler.prototype.linkifySource = function(source) {
 
 	// Locate and linkify other methods within source (add marker for linkification)

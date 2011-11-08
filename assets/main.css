@@ -139,6 +139,11 @@ pre#lines a:hover {
 	color: #FFF;
 }
 
+pre .real_source {
+	background: yellow;
+	display: block;
+}
+
 #desc {
 	background: #EEE;
 	padding: 15px;
