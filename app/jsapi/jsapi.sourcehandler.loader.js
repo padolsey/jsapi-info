@@ -41,7 +41,7 @@ Loader.prototype.getRemoteSource = function() {
 
 	var me = this,
 		libURL = url.parse(
-			this.libraryData.url.replace('{VERSION}', this.ver)
+			this.libraryData.url.replace('{VERSION}', this.requestData.ver)
 		),
 		filestream = fs.createWriteStream(this.filename, {
 			encoding: 'utf8'
