@@ -30,3 +30,6 @@ It works by loading the library you specify into an instance of [jsdom](https://
  2. Run `node server` in the `jsapi-info/app` directory
  3. Server should be running on `:8001`
 
+### Changelog
+
+ * `1.0.0` - Gotta start somewhere
