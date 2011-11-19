@@ -257,15 +257,25 @@ JSAPI.Request.prototype = {
 				SourceHandler.LINKIFY_MARKER[0] +
 
 				// avoid stuff with elements within (this should not happen anyway
-				// since LINKIFY_MARKERs are not highlighted my `highlight`)
-				'([^<>]+?)' + 
+				// since LINKIFY_MARKERs are not highlighted by `highlight`)
+				'(.+?)' + 
 
 				SourceHandler.LINKIFY_MARKER[1],
 
 				'g'
 			),
 			function($0, name) {
-				return '<a href="/' + [me.requestData.lib, me.requestData.ver, name].join('/') + '">' + name + '</a>';
+
+				var fullName = name;
+
+				if (/#/.test(name)) {
+					name = name.split('#');
+					fullName = name[0];
+					name = name[1]; 
+				}
+
+				return '<a href="/' + [me.requestData.lib, me.requestData.ver, fullName].join('/') + '">' + name + '</a>';
+			
 			}
 		).replace(
 			// Just in-case any LINKIFY_MARKERs are left, remove them:

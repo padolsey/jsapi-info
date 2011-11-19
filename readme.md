@@ -26,10 +26,12 @@ It works by loading the library you specify into an instance of [jsdom](https://
 
 ### Installation / Running it
 
- 1. Run `npm install jsdom` in the `jsapi-info/app` directory
- 2. Run `node server` in the `jsapi-info/app` directory
+ 1. `cd jsapi-info/app`
+ 2. `npm install .`
+ 2. `node server`
  3. Server should be running on `:8001`
 
 ### Changelog
 
  * `1.0.0` - Gotta start somewhere
+ * `1.1.0` - Add `package.json` to manage dependencies. Linkifies `this.methodName` calls with new *LINK_MARKER* syntax (incl. name of item, e.g. `this.css`, and the full name, e.g. *jQuery.fn.css*). Sorts methods in sidebar by similarity to current method name (done with [similarity.js](https://github.com/jamespadolsey/similarity.js)).

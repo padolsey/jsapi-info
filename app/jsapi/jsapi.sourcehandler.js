@@ -66,6 +66,9 @@ function SourceHandler(requestData, libData) {
 
 SourceHandler.prototype = new events.EventEmitter;
 
+// Format of marked LINK: @@##__fullname#displayname__##@@
+//                    OR: @@##__displayandfullname__##@@
+//                    EG: @@##__jQuery.fn.data#this.data__##@@
 SourceHandler.LINKIFY_MARKER = ['@@##__', '__##@@'];
 
 SourceHandler.prototype.findSingleMethod = function(method) {
@@ -85,11 +88,9 @@ SourceHandler.prototype.findSingleMethod = function(method) {
 
 			log('Function resolved', this.meth);
 
-			var related = this.resolver.getMethods(resolved.namespace, function(fn){
+			var related = this.resolver.getMethods(resolved, function(fn){
 				return fn !== resolved.method;
-			}).slice(0, 12).sort(function(a, b){
-				return Math.random() > .5 ? -1 : 1;
-			});
+			}).slice(0, 12);
 
 			// Change start/end to take `expand` into account:
 			if (this.expandSourceN) {
@@ -105,7 +106,7 @@ SourceHandler.prototype.findSingleMethod = function(method) {
 
 				from: 'findSingleMethod',
 
-				source: this.linkifySource(source),
+				source: this.linkifySource(source, resolved),
 
 				full_source: this.source,
 
@@ -144,7 +145,7 @@ SourceHandler.prototype.findAllMethods = function() {
 		methods;
 
 	for (var i = -1, l = namespaces.length; ++i < l;) {
-		methods = this.resolver.getMethods(namespaces[i]);
+		methods = this.resolver.getMethods({namespace: namespaces[i]});
 		if (methods) {
 			ret[namespaces[i]] = methods.map(function(item){
 				item.link =
@@ -202,28 +203,38 @@ SourceHandler.prototype.validateMethod = function(resolved, emit) {
 
 };
 
-SourceHandler.prototype.linkifySource = function(source) {
+SourceHandler.prototype.linkifySource = function(source, parentFnResolved) {
 
 	// Locate and linkify other methods within source (add marker for linkification)
 	
 	var me = this,
-		lookIn = '(?:' + this.libData.look_in.join('|')
+		lookIn = '(' + this.libData.look_in.join('|')
 				// Escape all except '|' which we need...
-				.replace(/[-[\]{}()*+?.,\\^$#\s]/g, "\\$&") + ')';
+				.replace(/[-[\]{}()*+?.,\\^$#\s]/g, "\\$&") + '|this' + ')';
 
 	return source.replace(
 
-		RegExp(lookIn + '\.([a-zA-Z0-9$_]+)', 'g'),
+		RegExp('([^0-9a-z_$])(' + lookIn + '\.([a-zA-Z0-9$_]+))', 'gi'),
 
-		function($0, name) {
+		function($0, pre, full, namespace, name) {
+
+			// Pre is ([^0-9a-z_$])
+			// Used because we can't use lookbehinds to ensure that this was
+			// not preceded by a legal identifier character. 
+
+			var fullName = full;
+
+			if (/^this\./.test(full)) {
+				fullName = parentFnResolved.namespace + '.' + name;
+			}
 			
-			var resolved = me.resolver.resolve(name);
+			var resolved = me.resolver.resolve(fullName);
 
 			if ( resolved && me.validateMethod(resolved, false /* don't emit */) ) {
-				return SourceHandler.LINKIFY_MARKER[0] + $0 + SourceHandler.LINKIFY_MARKER[1];
+				return pre + SourceHandler.LINKIFY_MARKER[0] + fullName + '#' + full + SourceHandler.LINKIFY_MARKER[1];
 			}
 
-			return $0;
+			return pre + full;
 
 		}
 
