@@ -4,7 +4,7 @@
   "description": "JSAPI dependencies",
   "author": "James Padolsey",
   "dependencies": {
-    "similarity": "0.1.x",
+    "relevancy": "0.1.x",
     "jsdom": "0.2.x"
   },
   "engine": "node >= 0.4.1"
