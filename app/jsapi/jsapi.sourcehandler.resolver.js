@@ -1,5 +1,5 @@
 var log = require('./jsapi.log.js'),
-	similarity = require('similarity');
+	relevancy = require('relevancy');
 
 /**
  * SourceHandler.Resolver
@@ -49,7 +49,7 @@ Resolver.prototype = {
 			fullyQualifiedName: fqName,
 			namespace: resolvedNamespace,
 			method: resolved,
-			methodName: fqName.split('.').pop(),
+			methodName: resolved && fqName.split('.').pop(),
 			string: resolved && resolved.toString(),
 			location: resolved && this.getLocationInSource(resolved.toString())
 		};
@@ -122,7 +122,7 @@ Resolver.prototype = {
 			}
 		}
 
-		return methodName ? similarity.sort(
+		return methodName ? relevancy.sort(
 			ret.map(function(item){
 				item.toString = function() {
 					return this.name;
@@ -131,37 +131,6 @@ Resolver.prototype = {
 			}),
 			methodName
 		) : ret;
-
-	},
-
-	sortMethodsBySimilarityTo: function(methods, to) {
-
-		var regex = (function(){
-			for (var ret = [], i = to.length; i--;)
-				ret.push(to.replace(/[-[\]{}()*+?.,\\^$#\s|]/g, "\\$&").slice(0, i + 1));
-			return RegExp(ret.join('|'), 'ig');
-		}());
-
-		return methods.sort(function(a,b){
-
-			a = a.name;
-			b = b.name;
-
-			regex.lastIndex = 0;
-			var matchA = (regex.exec(a)||['']).sort()[0],
-				iA = (regex.lastIndex - matchA.length) * matchA.length - matchA.length;
-
-			regex.lastIndex = 0;
-
-			var matchB = (regex.exec(b)||['']).sort()[0],
-				iB = (regex.lastIndex - matchB.length) * matchB.length - matchB.length;
-
-			//console.log(a, matchA, iA, '->', (iB < iA ? 1 : -1));
-			//console.log(b, matchB, iB);
-			return matchA && matchB ? 
-				(iB < iA ? 1 : -1)
-				: matchA ? -1 : 1;
-		});
 
 	}
 
