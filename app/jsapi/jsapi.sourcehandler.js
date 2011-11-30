@@ -100,6 +100,7 @@ SourceHandler.prototype.findSingleMethod = function(method) {
 
 			// Grab the bit of source we want to show from the entire source:
 			source = this.source.split(/[\r\n]/);
+			end = Math.min(source.length - 1, end); // End shouldn't be more than full source length
 			source = source.slice(start - 1, end).join('\n');
 
 			this.emit('sourceData', {

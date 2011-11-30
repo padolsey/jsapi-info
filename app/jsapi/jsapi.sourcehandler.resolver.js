@@ -15,7 +15,7 @@ module.exports = Resolver = function SHResolver(env, source, libConfig) {
 Resolver.FN_RESOLVER = '\
 for (var __r__, __i__ = -1, __l__ = __names__.length; ++__i__ < __l__;) {\
 	try {\
-		if (__r__ = eval(__names__[__i__])) {\
+		if ((__r__ = eval(__names__[__i__])) && typeof __r__ == "function") {\
 			window.__fqName__ = __names__[__i__];\
 			return __r__;\
 		}\
