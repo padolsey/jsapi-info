@@ -98,14 +98,14 @@ Resolver.prototype = {
 			methodName = relatedTo.methodName,
 			window = this.env.window,
 			ret = [],
-			obj = window.Function('return ' + namespace)(),
+			obj = window.Function('try { return ' + namespace + '} catch(e) {}')(),
 			hasOwn = window.Object().hasOwnProperty;
 
 		log('LISTING METHODS', methodName);
 
 		fnCheck = fnCheck || function(){ return true; };
 
-		for (var i in obj) {
+		if (obj) for (var i in obj) {
 			if (
 				obj[i] &&
 				hasOwn.call(obj, i) &&
