@@ -58,7 +58,7 @@ function SourceHandler(requestData, libData) {
 
 				// Load required script:
 				this.requiredLoader = new SourceHandler.Loader(
-					this.requires.match(/\/([^\/]+)$/)[1],
+					this.requires.match(/\/([^\/]+)\.js$/)[1],
 					this.requires,
 					requestData.refresh
 				).on('success', function(rSource) {
