@@ -38,7 +38,23 @@
 		"default_version": "1.8.18",
 		"versions": ["1.8", "1.8.18"],
 		"get_real_version": "UI (\\d+\\.\\d+(?:\\.\\d+)?(?:pre)?)",
-		"look_in": ["jQuery.ui", "jQuery.widget", "jQuery.fn"],
+		"look_in": [
+			"jQuery.ui",
+			"jQuery.ui.draggable",
+			"jQuery.ui.droppable",
+			"jQuery.ui.selectable",
+			"jQuery.ui.autocomplete",
+			"jQuery.ui.button",
+			"jQuery.ui.buttonset",
+			"jQuery.ui.accordian",
+			"jQuery.ui.progressbar",
+			"jQuery.ui.resizable",
+			"jQuery.ui.sorter",
+			"jQuery.ui.tabs",
+			"jQuery.ui.menu",
+			"jQuery.widget",
+			"jQuery.fn"
+		],
 		"requires": {
 			"1.8": "http://code.jquery.com/jquery-1.7.js",
 			"1.8.18": "http://code.jquery.com/jquery-1.7.js"
