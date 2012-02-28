@@ -8,14 +8,13 @@ var events = require('events'),
  * SourceHandler.Loader
  * Takes care of loading source files
  */
-module.exports = Loader = function SHLoader(requestData, libraryData) {
+module.exports = Loader = function SHLoader(filename, uri, refresh) {
 
 	events.EventEmitter.call(this);
 
-	this.requestData = requestData;
-	this.libraryData = libraryData;
-
-	this.filename = './_libs/' + requestData.lib + '.' + requestData.ver + '.js';
+	this.uri = uri;
+	this.filename = './_libs/' + filename + '.js';
+	this.refresh = !!refresh;
 
 };
 
@@ -25,7 +24,7 @@ Loader.prototype.get = function() {
 
 	fs.stat(this.filename, function(err, stats) {
 
-		if (this.requestData.refresh || err && err.code === 'ENOENT') {
+		if (this.refresh || err && err.code === 'ENOENT') {
 			this.getRemoteSource();
 		} else if(err) {
 			this.emit('failure', {error: 'Error on file retrieval, ' + err.code});
@@ -40,9 +39,7 @@ Loader.prototype.get = function() {
 Loader.prototype.getRemoteSource = function() {
 
 	var me = this,
-		libURL = url.parse(
-			this.libraryData.url.replace('{VERSION}', this.requestData.ver)
-		),
+		libURL = url.parse(this.uri),
 		filestream = fs.createWriteStream(this.filename, {
 			encoding: 'utf8'
 		});

@@ -29,6 +29,21 @@
 		]
 	},
 
+	"jqui": "jqueryui",
+	"$ui": "jqueryui",
+	"jqueryui": {
+		"name": "jQuery UI",
+		"url": "http://ajax.googleapis.com/ajax/libs/jqueryui/{VERSION}/jquery-ui.js",
+		"dom_env": true,
+		"default_version": "1.8.18",
+		"versions": ["1", "1.8", "1.8.18"],
+		"get_real_version": "UI (\\d+\\.\\d+(?:\\.\\d+)?(?:pre)?)",
+		"look_in": ["jQuery.ui", "jQuery.widget", "jQuery.fn"],
+		"requires": {
+			"1.8": "http://code.jquery.com/jquery-1.7.js"
+		}
+	},
+
 	"mootools": {
 		"name": "MooTools",
 		"url": "http://ajax.googleapis.com/ajax/libs/mootools/{VERSION}/mootools.js",

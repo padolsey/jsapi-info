@@ -37,29 +37,45 @@ function SourceHandler(requestData, libData) {
 
 	this.libData = libData;
 
-	this.loader = new SourceHandler.Loader(requestData, libData);
+	this.loader = new SourceHandler.Loader(
+		requestData.lib + '.' + requestData.ver,
+		libData.url.replace('{VERSION}', requestData.ver),
+		requestData.refresh
+	);
+
+	this.requires = libData.requires && libData.requires[requestData.ver];
+
+	if (this.requires) {
+
+		// In the case that this lib requires another file we want
+		// to request the required file and then we can continue with
+		// `setupEnvironment` ...
+
+		this.loader
+			.on('success', function(source) {
+
+				log('Loaded lib URL: now loading requirement: ', this.requires);
+
+				// Load required script:
+				this.requiredLoader = new SourceHandler.Loader(
+					this.requires.match(/\/([^\/]+)$/)[1],
+					this.requires,
+					requestData.refresh
+				).on('success', function(rSource) {
+					this.setupEnvironment(source, rSource);
+				}.bind(this)).on('failure', function() {
+					this.loader.emit('failure');
+				}.bind(this)).get();
+			}.bind(this));
+			
+	} else {
+		this.loader.on('success', this.setupEnvironment.bind(this));
+	}
 
 	this.loader
-
-		.on('success', function(source) {
-
-			this.source = source;
-			
-			this.env = new SourceHandler.Environment(this.nullify + this.source);
-
-			this.env.on('ready', function(){
-				this.resolver = new SourceHandler.Resolver(this.env, this.source, this.libData);
-				this.emit('ready');
-			}.bind(this));
-
-			this.env.init();
-
-		}.bind(this))
-
 		.on('failure', function(){
 			log('Failure on SourceHandler.Loader', arguments);
 		}.bind(this))
-
 		.get();
 
 }
@@ -70,6 +86,23 @@ SourceHandler.prototype = new events.EventEmitter;
 //                    OR: @@##__displayandfullname__##@@
 //                    EG: @@##__jQuery.fn.data#this.data__##@@
 SourceHandler.LINKIFY_MARKER = ['@@##__', '__##@@'];
+
+SourceHandler.prototype.setupEnvironment = function(source, preRequiredSource) {
+	this.source = source;
+
+	preRequiredSource = preRequiredSource || ''; // e.g. jQuery for jQuery UI (requirement)
+	
+	this.env = new SourceHandler.Environment(
+		this.nullify + ';' + preRequiredSource + ';' + this.source
+	);
+
+	this.env.on('ready', function(){
+		this.resolver = new SourceHandler.Resolver(this.env, this.source, this.libData);
+		this.emit('ready');
+	}.bind(this));
+
+	this.env.init();
+};
 
 SourceHandler.prototype.findSingleMethod = function(method) {
 
