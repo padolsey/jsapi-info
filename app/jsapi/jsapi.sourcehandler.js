@@ -43,7 +43,7 @@ function SourceHandler(requestData, libData) {
 		requestData.refresh
 	);
 
-	this.requires = libData.requires && libData.requires[requestData.ver];
+	this.requires = libData.requires && (libData.requires[requestData.ver]  || libData.requires['*']);
 
 	if (this.requires) {
 
@@ -53,21 +53,13 @@ function SourceHandler(requestData, libData) {
 
 		this.loader
 			.on('success', function(source) {
-
-				log('Loaded lib URL: now loading requirement: ', this.requires);
-
-				// Load required script:
-				this.requiredLoader = new SourceHandler.Loader(
-					this.requires.match(/\/([^\/]+)\.js$/)[1],
-					this.requires,
-					requestData.refresh
-				).on('success', function(rSource) {
+				this.loadRequirements(this.requires, requestData.refresh, function(rSource) {
 					this.setupEnvironment(source, rSource);
-				}.bind(this)).on('failure', function() {
+				}, function() {
 					this.loader.emit('failure');
-				}.bind(this)).get();
+				});
 			}.bind(this));
-			
+
 	} else {
 		this.loader.on('success', this.setupEnvironment.bind(this));
 	}
@@ -86,6 +78,33 @@ SourceHandler.prototype = new events.EventEmitter;
 //                    OR: @@##__displayandfullname__##@@
 //                    EG: @@##__jQuery.fn.data#this.data__##@@
 SourceHandler.LINKIFY_MARKER = ['@@##__', '__##@@'];
+
+SourceHandler.prototype.loadRequirements = function(requirements, isRefresh, cb, err) {
+
+	// Load one or more requirements (call cb with concat'd requirements in order)
+
+	requirements = typeof requirements == 'string' ? [requirements] : requirements.slice();
+
+	var hoc = this;
+	var rSources = [];
+
+	load(requirements.shift());
+
+	function load(uri) {
+		new SourceHandler.Loader(
+			uri.match(/\/([^\/]+)\.js$/)[1],
+			uri,
+			isRefresh
+		).on('success', function(rSource) {
+			rSources.push(rSource);
+			if (requirements.length) {
+				load(requirements.shift());
+			} else {
+				cb.call(hoc, rSources.join('\n;\n'));
+			}
+		}).on('failure', err.bind(hoc));
+	}
+};
 
 SourceHandler.prototype.setupEnvironment = function(source, preRequiredSource) {
 	this.source = source;
